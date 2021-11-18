@@ -1,0 +1,184 @@
+{% include "header.html" %}
+
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/bootstrap.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/bootstrap-select.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/application.css')}}">
+ 
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-8" style="margin-right: 20px">
+                    <h2 style="margin-top: 0px">
+                    Colleges List
+                    </h2>
+                </div>
+                <!-- Filter table field -->
+                <div class="col-md-2" style="margin-right: -20px">
+                    <input id="filterkey" class="form-control" type="text" placeholder="Filter...">
+                </div>
+                <!-- Add new college button -->
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary btn-block pull-right" data-toggle="modal" data-target="#newCollegeModal">
+                    Add New College
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts for add, update and remove college -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            {% if category=="success" %}
+                <div class="alert alert-success alert-dismissable show" role="alert">
+                <strong>Done! </strong>{{ message }}
+                </div>
+            {% else %}
+                <div class="alert alert-danger alert-dismissable show" role="alert">
+                <strong>Oops! </strong>{{ message }}
+                </div>
+            {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- All colleges table from DB -->
+        <div class="panel panel-default">
+            <table class="table">
+                <tr>
+                <th style="width: 12%">Code</th>
+                <th>Institution Name</th>
+                <th style="width: 13%"></th>
+                </tr>
+
+                {% for row in colleges %}
+                <tbody id="collegerows">
+                <tr>
+                <td>{{row.0}}</td>
+                <td>{{row.1}}</td>
+                <td class="text-right">
+                    <!-- action buttons (update, remove) -->
+                    <a href="/updatecollege/{{row.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#updatecollege{{row.0}}">Update</a>
+                    <a href="/colleges/remove/{{row.0}}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you would like to remove this college? Courses and students in this college will also be removed.')">Remove</a> 
+                </td>
+                </tr>
+                </tbody>
+
+<!-- Update College Modal -->
+<div id="updatecollege{{row.0}}" class="modal fade in" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Update College Information
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </h4>
+            </div>
+            <!-- update college form -->
+            <div class="modal-body">
+                <form action="{{url_for('colleges.updatecollege')}}" method="POST">
+                    <div class="row">
+                        <!-- College code -->
+                        <div class="col-md-3" style="padding-right: 5px">
+                            <div class="form-group">
+                                <label>Code</label>
+                                <input type="text" class="form-control" value="{{row.0}}" disabled>
+                                <input name="updateCollegeCode" type="hidden" value="{{row.0}}">
+                            </div>
+                        </div>
+                        <!-- College name -->
+                        <div class="col-md-9" style="padding-left: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Institution Name</label>
+                                <input id="updateCollegeName" name="updateCollegeName" type="text" class="form-control" value="{{row.1}}" required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update college</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <h6 class="pull-left">Make sure the information is accurate.</h6>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Add New College Modal -->
+<div class="modal fade in" id="newCollegeModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class=modal-title>Add New College
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </h4>
+            </div>
+            <!-- new college form -->
+            <div class="modal-body">
+                <form id="addCollegeForm" action="{{url_for('colleges.addcollege')}}" method="POST">
+                    <div class="row">
+                        <!-- College code -->
+                        <div class="col-md-3" style="padding-right: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Code</label>
+                                <input id="inputCollegeCode" name="inputCollegeCode" type="text" class="form-control" placeholder="XXXXXX" required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                        <!-- College name -->
+                        <div class="col-md-9" style="padding-left: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Institution Name</label>
+                                <input id="inputCollegeName" name="inputCollegeName" type="text" class="form-control" placeholder="College of..." required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <h6 class="pull-left">Make sure the forms are accurately filled.</h6>
+                <!-- footer buttons -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" form="addCollegeForm">Add college</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap-select.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap-validate.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/application.js')}}"></script>
+<!-- Form validation script -->
+<script>
+    bootstrapValidate('#inputCollegeCode', 'max:6:Must not exceed 6 characters!');
+    bootstrapValidate('#inputCollegeName', 'max:100:Must not exceed 100 characters!');
+    bootstrapValidate('#updateCollegeName', 'max:100:Must not exceed 100 characters!');
+</script>
+<!-- Filter table script -->
+<script>
+    $(document).ready(function(){
+      $("#filterkey").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#collegerows tr").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+</script>
+
+{% endblock %}
