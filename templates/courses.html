@@ -1,0 +1,218 @@
+{% include "header.html" %}
+
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/bootstrap.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/bootstrap-select.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/application.css')}}">
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-8" style="margin-right: 20px">
+                    <h2 style="margin-top: 0px">
+                    Courses List
+                    </h2>
+                </div>
+                <!-- Filter table field -->
+                <div class="col-md-2" style="margin-right: -20px">
+                    <input id="filterkey" class="form-control" type="text" placeholder="Filter...">
+                </div>
+                <!-- Add new course button -->
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary btn-block pull-right" data-toggle="modal" data-target="#newCourseModal">
+                    Add New Course
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <!-- Success alerts for add, update and remove course-->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category=="success" %}
+            <div class="alert alert-success alert-dismissable show" role="alert">
+            <strong>Done! </strong>{{ message }}
+            </div>
+        {% else %}
+            <div class="alert alert-danger alert-dismissable show" role="alert">
+            <strong>Oops! </strong>{{ message }}
+            </div>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+        <!-- All courses table from DB -->
+        <div class="panel panel-default">
+            <table class="table table">
+                <tr>
+                <th style="width: 8%">Code</th>
+                <th>Name</th>
+                <th>College</th>
+                <th style="width: 13%"></th>
+                </tr>
+
+                <!-- fill from database -->
+                {% for row in courses %}
+                <tbody id="courserows">
+                <tr>
+                    <td>{{row.0}}</td>
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td class="text-right">
+                        <!-- action buttons (update, remove) -->
+                        <a href="/updatecourse/{{row.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#updatecourse{{row.0}}">Update</a>
+                        <a href="/courses/remove/{{row.0}}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you would like to remove this course? Students enrolled in this course will also be removed.')">Remove</a> 
+                    </td>
+                </tr>
+                </tbody>
+
+<!-- Update Course Modal -->
+<div id="updatecourse{{row.0}}" class="modal fade in" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> Update Course Information
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </h4>
+            </div>
+            <!-- Update course form -->
+            <div class="modal-body">
+                <form action="{{url_for('courses.updatecourse')}}" method="POST">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="collegeCode">College</label>
+                                <select name="updateCollegeCode" class="form-control" required>
+                                    <option selected value="{{row.3}}">{{row.2}} (Current)</option>
+                                    <!-- populate dropdown from colleges -->
+                                    {% for row in colleges %}
+                                    <option value="{{row.0}}">{{row.1}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Course code form -->
+                        <div class="col-md-3" style="padding-right: 5px">
+                            <div class="form-group">
+                                <label>Code</label>
+                                <input type="text" class="form-control" value="{{row.0}}" disabled>
+                                <input name="updateCourseCode" type="hidden" value="{{row.0}}">
+                            </div>
+                        </div>
+                        <!-- Course name form -->
+                        <div class="col-md-9" style="padding-left: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Name</label>
+                                <input id=updateCourseName name="updateCourseName" type="text" class="form-control" value="{{row.1}}" required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update course</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <h6 class="pull-left">Make sure the information is accurate.</h6>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Add New Course Modal -->
+<div class="modal fade in" id="newCourseModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class=modal-title>Add New Course
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </h4>
+            </div>
+            <!-- new course form -->
+            <div class="modal-body">
+                <form id="addCourseForm" action="{{url_for('courses.addcourse')}}" method="POST">
+                    <div class="row">
+                        <!-- College Code and college name -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="collegeCode">College</label>
+                                <select name="inputCollegeCode" class="form-control" required>
+                                    <option selected disabled value="">Choose...</option>
+                                    <!-- populate dropdown from colleges -->
+                                    {% for row in colleges %}
+                                    <option value="{{row.0}}">{{row.1}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Course code form -->
+                        <div class="col-md-3" style="padding-right: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Code</label>
+                                <input id=inputCourseCode name=inputCourseCode type="text" class="form-control" placeholder="XXXXX" required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                        <!-- Course name form -->
+                        <div class="col-md-9" style="padding-left: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Name</label>
+                                <input id=inputCourseName name="inputCourseName" type="text" class="form-control" placeholder="Course Name" required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <h6 class="pull-left">Make sure the forms are accurately filled.</h6>
+                <!-- footer buttons -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" form="addCourseForm">Add course</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap-select.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap-validate.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/application.js')}}"></script>
+<!-- Form validate script -->
+<script>
+    bootstrapValidate('#inputCourseCode', 'max:5:Must not exceed 5 characters!');
+    bootstrapValidate('#inputCourseName', 'max:100:Must not exceed 100 characters!');
+    bootstrapValidate('#updateCourseName', 'max:100:Must not exceed 100 characters!');
+</script>
+<!-- Filter table script -->
+<script>
+    $(document).ready(function(){
+      $("#filterkey").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#courserows tr").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+</script>
+
+{% endblock %}

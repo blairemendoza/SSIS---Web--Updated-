@@ -1,0 +1,112 @@
+{% include "header.html" %}
+
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/bootstrap.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/bootstrap-select.min.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename = 'css/application.css')}}">
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="page-header">
+            <div class="row">
+                <div class="col-md-8" style="margin-right: 20px">
+                    <h2 style="margin-top: 0px">
+                    Students List
+                    </h2>
+                </div>
+                <!-- Filter table field -->
+                <div class="col-md-2" style="margin-right: -20px">
+                    <input id="filterkey" class="form-control" type="text" placeholder="Filter...">
+                </div>
+                <!-- Add new student button -->
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary btn-block pull-right" data-toggle="modal" data-target="#newStudentModal">
+                    Add New Student
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    <!-- Success alerts for add, update and remove student-->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        {% if category=="success" %}
+            <div class="alert alert-success alert-dismissable show" role="alert">
+            <strong>Done! </strong>{{ message }}
+            </div>
+        {% else %}
+            <div class="alert alert-danger alert-dismissable show" role="alert">
+            <strong>Oops! </strong>{{ message }}
+            </div>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+        <!-- Dependent student list from database -->
+        <div class="panel panel-default">
+            <table id="studenttable" class="table">
+
+                <tr class="header">
+                    <th style="width: 12%">ID Number</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>Course</th>
+                    <th>Year</th>
+                    <th>Gender</th>
+                    <th style="width: 13%"></th>
+                </tr>
+
+                <!-- fill from database -->
+                {% for row in students %}
+                <tbody id="studentrows">
+                <tr>
+                    <td>{{row.0}}</td>
+                    <td>{{row.1}}</td>
+                    <td>{{row.2}}</td>
+                    <td>{{row.3}}</td>
+                    <td>{{row.4}}</td>
+                    <td>{{row.5}}</td>
+                    <td class="text-right">
+                        <!-- action buttons (update, remove) -->
+                        
+                    </td>
+                </tr>
+                </tbody>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap-select.min.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/bootstrap-validate.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='js/application.js')}}"></script>
+<!-- Form validate script -->
+<script>
+    bootstrapValidate('#inputIDNumber', 'max:9:Must not exceed 9 values!');
+    bootstrapValidate('#inputLastName', 'max:50:Must not exceed 50 characters!');
+    bootstrapValidate('#inputFirstName', 'max:100:Must not exceed 100 characters!');
+    bootstrapValidate('#inputYearLevel', 'integer:Must be an integer!');
+    bootstrapValidate('#updateLastName', 'max:50:Must not exceed 50 characters!');
+    bootstrapValidate('#updateFirstName', 'max:100:Must not exceed 100 characters!');
+    bootstrapValidate('#updateYearLevel', 'integer:Must be an integer!');
+</script>
+<!-- Filter table script -->
+<script>
+    $(document).ready(function(){
+      $("#filterkey").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#studentrows tr").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+</script>
+
+{% endblock %}
