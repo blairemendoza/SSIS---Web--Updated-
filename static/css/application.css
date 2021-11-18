@@ -1,0 +1,26 @@
+/* form clear button */
+::-ms-clear {
+    display: none;
+  }
+  
+  .form-control-clear {
+    z-index: 10;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+.navbar {
+  min-height: 80px;
+}
+  
+.navbar-brand {
+  padding: 7px 15px;
+  height: 80px;
+  line-height: 80px;
+}
+  
+.navbar-nav > li > a {
+  padding-top: 25px;
+  padding-bottom: 25px;
+  line-height: 29px;
+}
