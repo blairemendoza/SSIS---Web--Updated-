@@ -71,13 +71,189 @@
                     <td>{{row.5}}</td>
                     <td class="text-right">
                         <!-- action buttons (update, remove) -->
-                        
+                        <a href="/updatestudent/{{row.0}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#updatestudent{{row.0}}">Update</a>
+                        <a href="/remove/{{row.0}}" class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you would like to remove this student? This action cannot be undone.')">Remove</a>
                     </td>
                 </tr>
                 </tbody>
+
+<!-- Update Student Modal -->
+<div id="updatestudent{{row.0}}" class="modal fade in" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Update Student Information
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </h4>
+            </div>
+            <!-- Update student details forms -->
+            <div class="modal-body">
+                <form action ="{{url_for('updatestudent')}}" method="POST">
+                    <div class="row">
+                        <div class="col-md-5" style="padding-right: 5px">
+                            <div class="form-group">
+                                <label>ID Number</label>
+                                <input type="text" class="form-control" value="{{row.0}}" disabled>
+                                <input name="updateID" type="hidden" value="{{row.0}}">
+                            </div>
+                        </div>
+                        <div class="col-md-3" style="padding-left: 5px; padding-right: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Year</label>
+                                <input id="updateYearLevel" name="updateYearLevel" type="int" class="form-control" value="{{row.4}}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4" style="padding-left: 5px">
+                            <div class="form-group">
+                                <label for="updateGender">Gender</label>
+                                <select name="updateGender" class="form-control" data-live-search="true">
+                                    <option selected value="{{row.5}}">{{row.5}} (Current)</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6" style="padding-right: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Name</label>
+                                <input id="updateLastName" name="updateLast" type="text" class="form-control" placeholder="Last Name" value={{row.1}} required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6" style="padding-left: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>⠀</label>
+                                <input id="updateFirstName" name="updateFirstName" type="text" class="form-control" placeholder="First Name" value="{{row.2}}" required>
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="updateCourse">Course</label>
+                                <select name="updateCourse" class="form-control">
+                                    <!-- populate dropdown from courses -->
+                                    <option selected value="{{row.3}}">{{row.3}} (Current)</option>
+                                    {% for data in courses %}
+                                    <option value="{{data.0}}">{{data.1}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update student</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <h6 class="pull-left">Make sure the information is accurate.</h6>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
                 {% endfor %}
             </table>
         </div>
+    </div>
+</div>
+
+
+
+<!-- Add New Student Modal -->
+<div class="modal fade in" id="newStudentModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add New Student
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <!-- add new student form -->
+                <!-- post values to 'add' function -->
+                <form id="addStudentForm" action ="{{url_for('addstudent')}}" method="POST">
+                    <div class="row">
+                        <!-- ID number form -->
+                        <div class="col-md-5" style="padding-right: 5px">
+                            <div class="form-group">
+                                <label>ID Number</label>
+                                <input id="inputIDNumber" name="inputIDNumber" type="text" class="form-control" placeholder="YYYY-NNNN" required>
+                            </div>
+                        </div>
+                        <!-- Year form -->
+                        <div class="col-md-3" style="padding-left: 5px; padding-right: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Year</label>
+                                <input id="inputYearLevel" name="inputYearLevel" type="int" class="form-control" placeholder="Year" required>
+                                <!-- clear entry button -->
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                        <!-- Gender dropdown -->
+                        <div class="col-md-4" style="padding-left: 5px">
+                            <div class="form-group">
+                                <label for="inputGender">Gender</label>
+                                <select name="inputGender" class="form-control">
+                                    <option selected disabled value="">Choose...</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Last name form -->
+                        <div class="col-md-6" style="padding-right: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>Name</label>
+                                <input id="inputLastName" name="inputLastName" type="text" class="form-control" placeholder="Last Name", required>
+                                <!-- clear entry button -->
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                        <!-- First name form -->
+                        <div class="col-md-6" style="padding-left: 5px">
+                            <div class="form-group has-feedback has-clear">
+                                <label>⠀</label>
+                                <input id="inputFirstName" name="inputFirstName" type="text" class="form-control" placeholder="First Name", required>
+                                <!-- clear entry button -->
+                                <span class="form-control-clear glyphicon glyphicon-remove form-control-feedback hidden"></span>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="row">
+                        <!-- Dependent course dropdown w/ search -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="inputCourse">Course</label>
+                                <select name="inputCourse" class="form-control selectpicker" data-live-search="true" required>
+                                    <option selected disabled value="">Choose...</option>
+                                    <!-- populate dropdown from courses in index -->
+                                    {% for row in courses %}
+                                    <option value="{{row.0}}">{{row.1}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                          </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <h6 class="pull-left">Make sure the forms are accurately filled.</h6>
+                <!-- footer buttons -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" form="addStudentForm">Add student</button>
+            </div>
+        </div>  
     </div>
 </div>
 
