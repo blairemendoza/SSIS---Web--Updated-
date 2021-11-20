@@ -93,8 +93,8 @@
                         <div class="col-md-5" style="padding-right: 5px">
                             <div class="form-group">
                                 <label>ID Number</label>
-                                <input type="text" class="form-control" value="{{row.0}}" disabled>
-                                <input name="updateID" type="hidden" value="{{row.0}}">
+                                <input name="updateID"type="text" class="form-control" value="{{row.0}}">
+                                <input name="oldID" type="hidden" value="{{row.0}}">
                             </div>
                         </div>
                         <div class="col-md-3" style="padding-left: 5px; padding-right: 5px">
@@ -159,6 +159,9 @@
                 {% endfor %}
             </table>
         </div>
+        {% for row in count %}
+                <h6>Total students: {{row.0}}</h2>
+        {% endfor %}
     </div>
 </div>
 

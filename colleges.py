@@ -10,11 +10,12 @@ def collegeindex():
     
     cur = mysql.get_db().cursor()
     cur.execute('SELECT * FROM colleges ORDER BY college_code')
-    data = cur.fetchall()
-    cur.close()
+    data1 = cur.fetchall()
+    cur.execute('SELECT COUNT(*) FROM colleges')
+    data2 = cur.fetchall()
     
     # data -> colleges list
-    return render_template('colleges.html', colleges=data)
+    return render_template('colleges.html', colleges=data1, count=data2)
 
 
 # College functions
@@ -47,12 +48,13 @@ def updatecollege():
     
     collegecode = request.form['updateCollegeCode']
     collegename = request.form['updateCollegeName']
+    oldcode     = request.form['oldCollegeCode']
     
     try:
         cur = mysql.get_db().cursor()
         cur.execute('''UPDATE colleges
-                       SET college_name=%s
-                       WHERE college_code=%s''', (collegename, collegecode))
+                       SET college_code=%s, college_name=%s
+                       WHERE college_code=%s''', (collegecode, collegename, oldcode))
         mysql.get_db().commit()
         
         flash('College has been successfully updated.', 'success')
@@ -61,7 +63,7 @@ def updatecollege():
     except Exception as e:
         print('Update college error: ' + str(e))
         
-        flash('An unexpected error occurred.', 'error')
+        flash('College code already exists. Enter a unique college code.', 'error')
         return redirect(url_for('colleges.collegeindex'))
 
 # Remove college

@@ -101,8 +101,8 @@
                         <div class="col-md-3" style="padding-right: 5px">
                             <div class="form-group">
                                 <label>Code</label>
-                                <input type="text" class="form-control" value="{{row.0}}" disabled>
-                                <input name="updateCourseCode" type="hidden" value="{{row.0}}">
+                                <input name="updateCourseCode" type="text" class="form-control" value="{{row.0}}">
+                                <input name="oldCourseCode" type="hidden" value="{{row.0}}">
                             </div>
                         </div>
                         <!-- Course name form -->
@@ -128,6 +128,9 @@
                 {% endfor %}
             </table>
         </div>
+        {% for row in count %}
+            <h6>Total courses: {{row.0}}</h2>
+        {% endfor %}
     </div>
 </div>
 

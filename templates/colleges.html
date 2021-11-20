@@ -84,8 +84,8 @@
                         <div class="col-md-3" style="padding-right: 5px">
                             <div class="form-group">
                                 <label>Code</label>
-                                <input type="text" class="form-control" value="{{row.0}}" disabled>
-                                <input name="updateCollegeCode" type="hidden" value="{{row.0}}">
+                                <input name="updateCollegeCode" type="text" class="form-control" value="{{row.0}}">
+                                <input name="oldCollegeCode" type="hidden" value="{{row.0}}">
                             </div>
                         </div>
                         <!-- College name -->
@@ -110,6 +110,9 @@
                 {% endfor %}
             </table>
         </div>
+        {% for row in count %}
+            <h6>Total colleges: {{row.0}}</h2>
+        {% endfor %}
     </div>
 </div>
 

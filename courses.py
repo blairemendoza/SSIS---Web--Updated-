@@ -8,17 +8,19 @@ courses = Blueprint('courses', __name__, url_prefix='/courses')
 @courses.route('/')
 def coursesindex():
      
-     cur = mysql.get_db().cursor()
-     cur.execute('''SELECT courses.course_code, courses.course_name, colleges.college_name, colleges.college_code
-                    FROM courses, colleges
-                    WHERE courses.college_code=colleges.college_code ORDER BY colleges.college_name''')
-     data1 = cur.fetchall()
-     cur.execute('SELECT * FROM colleges')
-     data2 = cur.fetchall()
-     cur.close()
+    cur = mysql.get_db().cursor()
+    cur.execute('''SELECT courses.course_code, courses.course_name, colleges.college_name, colleges.college_code
+                   FROM courses, colleges
+                   WHERE courses.college_code=colleges.college_code ORDER BY colleges.college_name''')
+    data1 = cur.fetchall()
+    cur.execute('SELECT * FROM colleges')
+    data2 = cur.fetchall()
+    cur.execute('SELECT COUNT(*) FROM courses')
+    data3 = cur.fetchall()
 
-     # courses -> courses list
-     return render_template('courses.html', courses=data1, colleges=data2)
+
+    # courses -> courses list
+    return render_template('courses.html', courses=data1, colleges=data2, count=data3)
 
 
 # Courses functions
@@ -52,12 +54,13 @@ def updatecourse():
     coursecode  = request.form['updateCourseCode']
     coursename  = request.form['updateCourseName']
     collegecode = request.form['updateCollegeCode']
+    oldcode     = request.form['oldCourseCode']
     
     try:
         cur = mysql.get_db().cursor()
         cur.execute('''UPDATE courses
-                       SET course_name=%s, college_code=%s
-                       WHERE course_code=%s''', (coursename, collegecode, coursecode))
+                       SET course_code=%s, course_name=%s, college_code=%s
+                       WHERE course_code=%s''', (coursecode, coursename, collegecode, oldcode))
         mysql.get_db().commit()
         
         flash('Course has been successfully updated.', 'success')
@@ -66,7 +69,7 @@ def updatecourse():
     except Exception as e:
         print('Update course error: ' + str(e))
         
-        flash('An unexpected error occurred.', 'error')
+        flash('Course code already exists. Enter a unique course code.', 'error')
         return redirect(url_for('courses.coursesindex'))
         
 # Remove course

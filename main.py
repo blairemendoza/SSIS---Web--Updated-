@@ -35,10 +35,12 @@ def home():
     data1 = cur.fetchall()
     cur.execute('SELECT course_code, course_name FROM courses')
     data2 = cur.fetchall()
-    cur.close()
+    cur.execute('SELECT COUNT(*) FROM students')
+    data3 = cur.fetchall()
+
     
     # data1 -> students list | data2 -> course dropdown
-    return render_template('home.html', students=data1, courses=data2)
+    return render_template('home.html', students=data1, courses=data2, count=data3)
 
 
 # Student functions
@@ -79,13 +81,14 @@ def updatestudent():
     course      = request.form['updateCourse']
     year        = request.form['updateYearLevel']
     gender      = request.form['updateGender']
+    oldid       = request.form['oldID']
     
     try:
         cur = mysql.get_db().cursor()
         cur.execute('''UPDATE students
-                       SET last_name=%s, first_name=%s, course=%s, year_level=%s, gender=%s
+                       SET id_number=%s, last_name=%s, first_name=%s, course=%s, year_level=%s, gender=%s
                        WHERE id_number=%s''',
-                       (lastname, firstname, course, year, gender, idnumber))
+                       (idnumber, lastname, firstname, course, year, gender, oldid))
         mysql.get_db().commit()
         
         flash('Student has been successfully updated.', 'success')
@@ -94,7 +97,7 @@ def updatestudent():
     except Exception as e:
         print('Update student error: ' + str(e))
         
-        flash('An unexpected error occurred.', 'error')
+        flash('ID number already exists. Use a unique ID number.', 'error')
         return redirect(url_for('home'))
     
 # Remove student
